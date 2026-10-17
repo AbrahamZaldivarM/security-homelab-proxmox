@@ -18,6 +18,10 @@ Changed attributes were mostly inode and modification time, with checksums chang
 - **`/usr/bin/`**: the bursts line up with package activity in the Wazuh dpkg alerts. I checked the apt history on each host. The changes were made by `unattended-upgrade` (Ubuntu automatic updates), plus a few installs I ran myself (Tailscale, the Wazuh agent, Pi-hole prerequisites). The Oct 12 batch included a kernel update on several hosts.
 - **`/etc/pihole/`**: Pi-hole's own query database (`pihole-FTL.db` and its WAL files), version file and downloaded blocklist copies. These change constantly by design. The Oct 16 burst matches me adding more blocklists.
 
+![Wazuh Discover showing file integrity alerts on the Pi-hole host](file-integrity-alerts.jpg)
+
+*Wazuh Discover, last 8 days: 38 file integrity alerts on the Pi-hole host, all under `/etc/pihole/` (the gravity database, the blocklist cache and the query database). Times are shown in local time (UTC-4).*
+
 ## Outcome
 
 - No unexplained binary changes
