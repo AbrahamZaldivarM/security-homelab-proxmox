@@ -25,6 +25,10 @@ Notable sources:
 | 20.196.193.222 | Microsoft Azure | 145 | Oct 16 | Not checked |
 | 52.141.7.184 | Microsoft Azure (Korea) | 115 | Oct 14 | In 1 OTX pulse |
 
+![Wazuh Discover showing webshell filename probes from Azure addresses](wordpress-and-webshell-probes.jpg)
+
+*Wazuh Discover, last 8 days: 41 alerts for three of the webshell filenames (`wp_filemanager.php`, `this_is_a_new_hello_world.php`, `wp-filemannger4h.php`), all HTTP 404 from rule 31101. Times are shown in local time (UTC-4).*
+
 The Azure hosts sent no user-agent at all. The Google Cloud host used a Chrome-on-Windows string.
 
 ## Outcome
