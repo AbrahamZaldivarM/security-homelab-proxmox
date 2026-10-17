@@ -86,6 +86,16 @@ Analysis of Apache access logs showed that these requests resulted in HTTP `404`
 
 In October 2026 I reviewed 8 days of alerts, about 5,600 web alerts in total. Over 99.9% were `404` responses, none returned a success or server error, and no "attack succeeded" rule fired. Most of the heavy sources were cloud-hosted servers (Google Cloud, Microsoft Azure, DigitalOcean). I now log real visitor IPs using Cloudflare's client IP header.
 
+Detailed write-ups:
+
+- [Web scanning activity (Rule 100100)](web-attacks/web-scanning-activity.md)
+- [Directory traversal attempt (Rule 100102)](web-attacks/directory-traversal-attempt.md)
+- [Environment file sweep](web-attacks/env-file-sweep.md)
+- [WordPress and webshell probing](web-attacks/wordpress-and-webshell-probes.md)
+- [Path traversal from a spoofed crawler](web-attacks/spoofed-crawler-path-traversal.md)
+- [File integrity alerts](investigations/file-integrity-alerts.md)
+- [October 2026 alert review](investigations/2026-10-web-alert-review.md)
+
 ---
 
 ## Defensive Measures Implemented
