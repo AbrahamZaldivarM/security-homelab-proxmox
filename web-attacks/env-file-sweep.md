@@ -25,6 +25,10 @@ Source hosts (all hosted in cloud or VPS providers):
 | 213.209.159.133 | Feo Prest SRL (Germany) | Oct 15 | **Reported**: 4 DShield attack reports (Aug 30 to Oct 12), listed in 30 AlienVault OTX threat-intel pulses |
 | 34.145.145.8 | Google Cloud (US) | Oct 16 | No reports found |
 
+![Wazuh Discover showing the /.env.swp requests](env-file-sweep.jpg)
+
+*Wazuh Discover, last 8 days: 7 alerts for `/.env.swp`, all HTTP 404. Times are shown in local time (UTC-4). The two requests from 127.0.0.1 are from before I enabled real visitor IP logging.*
+
 User-agents were generic desktop and mobile browser strings (Chrome on Windows, macOS, Linux and Android), most likely spoofed.
 
 ## Outcome
