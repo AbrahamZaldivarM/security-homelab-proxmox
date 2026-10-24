@@ -1,0 +1,3 @@
+name: injection-guard
+version: "1.0"
+description: Scans every tool result for prompt-injection phrasing before the model sees it; flags hits and logs them for Wazuh.

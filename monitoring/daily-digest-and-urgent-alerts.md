@@ -43,6 +43,7 @@ A separate always-on service follows `alerts.json` and sends a Discord message t
 | Wazuh rule level 12 or higher | High-severity detections |
 | A successful login from a source not on my trusted device list | Possible stolen credentials or unknown access |
 | `sudo` used by an account that is not one of my admin accounts | Unexpected privilege use |
+| A possible prompt injection reached my AI agent (rule 100210) | Shown with the source, matched patterns and an agent-specific action ([details](../ai-security/hermes-agent-sandbox.md)) |
 
 Design choices:
 

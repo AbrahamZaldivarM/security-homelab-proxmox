@@ -48,6 +48,8 @@ An example of the model's reasoning when it noticed:
 2. **Thinking on** for any step that reads outside content.
 3. **Human approval for every command.** A scanner only catches phrasings it knows, so the agent can never run a command without my explicit approval.
 
+**Update (Oct 24, 2026):** all three controls are now in place on my Hermes Agent deployment. The scanner runs as a Hermes plugin on every tool result, and a detection reaches my phone through Wazuh within seconds. See [Sandboxing an AI agent](hermes-agent-sandbox.md).
+
 ## MITRE ATLAS
 
 - AML.T0051.001 - LLM Prompt Injection: Indirect

@@ -15,7 +15,7 @@ The environment is built using Proxmox VE and consists of multiple virtual machi
 
 *The diagram above is my original three-VM layout (March 2026). The lab has grown since then, as described below.*
 
-The homelab currently includes four virtual machines:
+The homelab currently includes four virtual machines and one container:
 
 | Virtual Machine | Purpose |
 |----------------|--------|
@@ -23,8 +23,9 @@ The homelab currently includes four virtual machines:
 | siem-wazuh | Security monitoring platform (Wazuh manager, indexer and dashboard) |
 | pihole | DNS filtering for ads, trackers, malware and phishing (used by devices on my Tailscale network) |
 | LLM | Local language model server (GPU passthrough) that summarizes my security alerts |
+| hermes (container) | Sandboxed AI agent (Hermes Agent) with web search, isolated from the rest of the lab by firewall |
 
-I retired the original `wireguard` VM and now use Tailscale for remote access to the lab.
+I retired the original `wireguard` VM and now use Tailscale for remote access to the lab. In October 2026 I also removed the firewall rules it had left behind on other VMs.
 
 ### Storage and Backups
 
@@ -54,7 +55,7 @@ This architecture allows simulation of a monitored web service with centralized 
 ### Automation and AI
 - A local LLM (Qwen3.6-35B-A3B served with llama.cpp, thinking mode on) that writes a daily summary of my Wazuh alerts and sends it to a private Discord channel
 - An instant alert service that pings my phone on Discord for high-severity alerts, logins from unknown sources and unexpected `sudo` use (decided by code, not by the AI)
-- A prompt-injection scanner for the tool-using assistant I am building
+- Hermes Agent in an isolated container, with a prompt-injection scanner on every tool result and detections sent to Wazuh and my phone
 
 ---
 
@@ -117,7 +118,8 @@ I run my own language model and plan to let it use tools (web search and read-on
 
 - [Choosing a local LLM for my security tooling](ai-security/local-llm-model-evaluation.md) – three models compared on speed, tool calling, coding and injection resistance on my own GPU
 - [Prompt injection testing](ai-security/prompt-injection-testing.md) – the model never obeyed a planted instruction in 24 runs, but usually did not tell me the attack was there, so detection now happens in code
-- [injection_scan.py](ai-security/injection_scan.py) – the scanner that checks tool results before the model sees them
+- [Sandboxing an AI agent](ai-security/hermes-agent-sandbox.md) – Hermes Agent in a locked-down container; a plugin scans every tool result and a detection becomes a Wazuh alert on my phone
+- [injection_scan.py](ai-security/injection_scan.py) and the [Hermes plugin](ai-security/hermes-plugin/injection-guard/) – the scanner that checks tool results before the model sees them
 
 ---
 
@@ -144,7 +146,7 @@ These measures help minimize potential vulnerabilities and reduce the likelihood
 
 - Replace the failing internal drive with an SSD and move the Proxmox OS onto it
 - Add SMART disk-health alerts to my Discord alerting
-- Build the tool-using assistant: read-only tools first, every tool result scanned for injections, and my approval required for any command
+- Give the agent read-only access to my VMs through a dedicated account limited to specific commands
 - Block `.env`, `.git`, `wp-` and `.php` paths at Cloudflare, since my site is static
 - Evaluate Suricata on the web server to inspect decoded HTTP traffic
 - Continue tuning alert noise
