@@ -3,7 +3,7 @@
 ## Overview
 
 This project documents the design and operation of a personal cybersecurity homelab built using virtualization.
-The lab simulates a simplified enterprise security monitoring environment used to practice threat detection, log analysis, attack investigation, and system hardening.
+The lab simulates a simplified enterprise security monitoring environment used to practice threat detection, log analysis, attack investigation, incident response and system hardening.
 
 The environment is built using Proxmox VE and consists of multiple virtual machines that replicate common infrastructure components found in real-world environments.
 
@@ -26,6 +26,10 @@ The homelab currently includes four virtual machines:
 
 I retired the original `wireguard` VM and now use Tailscale for remote access to the lab.
 
+### Storage and Backups
+
+In October 2026 the host's only drive started failing. I moved all four VMs to a healthy drive while they kept running, and the web, SIEM and Pi-hole VMs are now backed up weekly to a separate drive (last 3 plus 4 weekly copies kept). The full incident is written up in [Failing host drive: detection, backup and live migration](investigations/2026-10-failing-disk-recovery.md).
+
 This architecture allows simulation of a monitored web service with centralized log collection, DNS-level filtering and secure remote access.
 
 ---
@@ -47,8 +51,10 @@ This architecture allows simulation of a monitored web service with centralized 
 - Tailscale (remote access)
 - Proxmox firewall (default-deny inbound at the host and on each VM)
 
-### Automation
-- A local LLM (Qwen3-Coder served with llama.cpp) that writes a daily summary of my Wazuh alerts and sends it to a private Discord channel
+### Automation and AI
+- A local LLM (Qwen3.6-35B-A3B served with llama.cpp, thinking mode on) that writes a daily summary of my Wazuh alerts and sends it to a private Discord channel
+- An instant alert service that pings my phone on Discord for high-severity alerts, logins from unknown sources and unexpected `sudo` use (decided by code, not by the AI)
+- A prompt-injection scanner for the tool-using assistant I am building
 
 ---
 
@@ -62,10 +68,11 @@ This setup allows investigation of:
 - Automated vulnerability scanning
 - Potential attack attempts against the web server
 - File integrity changes across hosts
+- Logins and privilege use on every VM
 
-My daily digest groups routine alerts into counts and keeps anything unusual visible (POST requests, successful responses, file changes with no matching package update). The summary is AI-generated, so I always check it against the data table it includes.
+My daily digest groups routine alerts into counts and keeps anything unusual visible (failed logins, logins from unknown sources, POST requests, successful responses, file changes with no matching package update). Key numbers are computed by code and printed next to the AI's summary, so I can check the summary against data the model did not produce.
 
-The monitoring environment provides hands-on experience analyzing real log data and identifying potential security events.
+How it works: [Alerting pipeline: daily AI digest and instant alerts](monitoring/daily-digest-and-urgent-alerts.md)
 
 ---
 
@@ -98,6 +105,22 @@ Detailed write-ups:
 
 ---
 
+## Incident Response
+
+- [Failing host drive: detection, backup and live migration](investigations/2026-10-failing-disk-recovery.md) – a read error during model testing led to a failing disk with hundreds of bad sectors; I verified backups and moved every VM to a healthy drive with no data loss and no downtime
+
+---
+
+## AI Security
+
+I run my own language model and plan to let it use tools (web search and read-only checks on my VMs), so I test it the way an attacker would.
+
+- [Choosing a local LLM for my security tooling](ai-security/local-llm-model-evaluation.md) – three models compared on speed, tool calling, coding and injection resistance on my own GPU
+- [Prompt injection testing](ai-security/prompt-injection-testing.md) – the model never obeyed a planted instruction in 24 runs, but usually did not tell me the attack was there, so detection now happens in code
+- [injection_scan.py](ai-security/injection_scan.py) – the scanner that checks tool results before the model sees them
+
+---
+
 ## Defensive Measures Implemented
 
 To reduce the attack surface of the environment and improve security, I implemented several hardening measures:
@@ -107,9 +130,11 @@ To reduce the attack surface of the environment and improve security, I implemen
 - Implementation of system hardening practices
 - Per-VM and host firewalls with a default-deny inbound policy, allowing only my LAN and my Tailscale network
 - Website published through a Cloudflare Tunnel, with no inbound ports opened for the site
-- Automatic security updates (unattended-upgrades) on the web, SIEM and Pi-hole VMs
+- Automatic security updates (unattended-upgrades) on the web, SIEM, Pi-hole and LLM VMs
 - DNS-level filtering of ad, tracker, malware and phishing domains with Pi-hole
 - Wazuh agent enrollment kept closed except for short, scripted windows when I add a host
+- Model server reachable only over Tailscale and protected by an API key
+- Weekly VM backups to a separate drive, with archives verified after copying
 
 These measures help minimize potential vulnerabilities and reduce the likelihood of successful exploitation attempts.
 
@@ -117,6 +142,9 @@ These measures help minimize potential vulnerabilities and reduce the likelihood
 
 ## Next Steps
 
+- Replace the failing internal drive with an SSD and move the Proxmox OS onto it
+- Add SMART disk-health alerts to my Discord alerting
+- Build the tool-using assistant: read-only tools first, every tool result scanned for injections, and my approval required for any command
 - Block `.env`, `.git`, `wp-` and `.php` paths at Cloudflare, since my site is static
 - Evaluate Suricata on the web server to inspect decoded HTTP traffic
 - Continue tuning alert noise

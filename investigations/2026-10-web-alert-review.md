@@ -6,11 +6,13 @@ I reviewed 8 days of Wazuh alert history covering my web server, SIEM host, Pi-h
 
 ## Numbers
 
-- 11,533 alerts in the window
-- 5,619 web alerts; 5,618 were HTTP 404 and one was 403
+- 11,519 alerts in the window
+- 5,618 web alerts; 5,617 were HTTP 404 and one was 403
 - No 2xx, 3xx or 5xx responses inside the web alerts, and none of Wazuh's "attack succeeded" rules fired
-- Since I enabled real visitor IPs on Oct 13: 3,738 requests from 83 distinct public IPs
+- Since I enabled real visitor IPs on Oct 13: 3,737 requests from 83 distinct public IPs
 - 44 of the web requests were POSTs; all others were GET
+
+*Corrected on Oct 24, 2026: my first count read Wazuh's live `alerts.json` together with the same day's archive file, which is the same file under another name (a hard link), so 14 alerts were counted twice. The numbers above are recounted with duplicate alert IDs removed. None of the conclusions changed.*
 
 ## Who was scanning
 
@@ -22,7 +24,7 @@ Request types (all web alerts):
 |---|---|
 | Script / webshell probes | 1,903 |
 | Secret / config / backup file probes | 1,745 |
-| WordPress probes | 1,180 |
+| WordPress probes | 1,179 |
 | Other | 654 |
 | Admin / login panel probes | 128 |
 | Traversal / injection attempts | 9 |
@@ -36,6 +38,7 @@ This is background internet scanning. My site is a static page, so none of the p
 - Apache now logs the real visitor IP through the Cloudflare header, trusted only from the local tunnel connector
 - My daily digest groups routine alerts into counts and keeps anything unusual visible (POSTs, successful responses, unexplained file changes)
 - I fixed a feedback loop where the digest's own output was logged and re-alerted
+- I fixed double counting in the digest, which read the live alert file and its archive copy as two files ([details](../monitoring/daily-digest-and-urgent-alerts.md))
 - Wazuh now ignores Pi-hole's database files
 - I added Pi-hole as a DNS filter for ads, trackers, malware and phishing
 
